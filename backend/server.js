@@ -91,7 +91,7 @@ app.use('/public', express.static('public'));
 mongoose
   .connect(
     process.env.MONGODB_URI ||
-      'xxx',//mongodb+srv://kumar4112005:Nandy19@gopal.dibirkd.mongodb.net/?retryWrites=true&w=majority&appName=Gopal//
+      'xxx',////
     {
       useNewUrlParser: true,
       useUnifiedTopology: true

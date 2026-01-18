@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAYAM 2.0 - Debug Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 12px; 
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            color: #2d3748; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            border-bottom: 3px solid #667eea; 
+            padding-bottom: 15px;
+        }
+        .tabs { 
+            display: flex; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .tab { 
+            padding: 12px 24px; 
+            background: #f7fafc; 
+            cursor: pointer; 
+            border: none; 
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab:hover { background: #edf2f7; }
+        .tab.active { 
+            background: #667eea; 
+            color: white; 
+            border-bottom-color: #667eea;
+        }
+        .content { 
+            background: #f8f9fa; 
+            padding: 25px; 
+            border-radius: 8px; 
+            border: 1px solid #e9ecef;
+        }
+        .btn { 
+            background: #667eea; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: #5a67d8; }
+        .btn.danger { background: #e53e3e; }
+        .btn.danger:hover { background: #c53030; }
+        .btn.success { background: #38a169; }
+        .btn.success:hover { background: #2f855a; }
+        
+        .result { 
+            background: #2d3748; 
+            color: #e2e8f0; 
+            padding: 20px; 
+            border-radius: 6px; 
+            margin-top: 15px; 
+            font-family: 'Courier New', monospace; 
+            max-height: 400px; 
+            overflow-y: auto;
+            border: 2px solid #4a5568;
+        }
+        .loading { 
+            color: #667eea; 
+            font-weight: bold; 
+            text-align: center;
+            padding: 20px;
+        }
+        .error { 
+            color: #e53e3e; 
+            background: #fed7d7; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-top: 10px;
+            border-left: 4px solid #e53e3e;
+        }
+        .success { 
+            color: #2f855a; 
+            background: #c6f6d5; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-top: 10px;
+            border-left: 4px solid #38a169;
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 500;
+            color: #2d3748;
+        }
+        .form-group input, .form-group textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus { 
+            outline: none; 
+            border-color: #667eea; 
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 20px;
+        }
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h3 { 
+            color: #667eea; 
+            margin-bottom: 15px; 
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .status { 
+            display: inline-block; 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status.online { background: #c6f6d5; color: #2f855a; }
+        .status.offline { background: #fed7d7; color: #e53e3e; }
+        .status.warning { background: #fefcbf; color: #d69e2e; }
+        
+        pre { 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+        }
+        .highlight { 
+            background: #667eea; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 3px; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ SWAYAM 2.0 Debug Dashboard</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">📊 System Overview</button>
+            <button class="tab" onclick="showTab('database')">🗄️ Database Viewer</button>
+            <button class="tab" onclick="showTab('email')">📧 Email Testing</button>
+            <button class="tab" onclick="showTab('logs')">📋 API Logs</button>
+        </div>
+
+        <!-- System Overview Tab -->
+        <div id="overview" class="content">
+            <div class="grid">
+                <div class="card">
+                    <h3>Server Status</h3>
+                    <div id="server-status">
+                        <div class="loading">Checking server status...</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Database Stats</h3>
+                    <div id="db-stats">
+                        <div class="loading">Loading database statistics...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="refreshOverview()">🔄 Refresh Overview</button>
+        </div>
+
+        <!-- Database Viewer Tab -->
+        <div id="database" class="content" style="display: none;">
+            <div class="grid">
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <button class="btn" onclick="viewUsers()">👥 View All Users</button>
+                    <button class="btn" onclick="viewCourses()">📚 View All Courses</button>
+                    <button class="btn" onclick="viewProgress()">📈 View Progress Records</button>
+                </div>
+            </div>
+            
+            <div id="db-result"></div>
+        </div>
+
+        <!-- Email Testing Tab -->
+        <div id="email" class="content" style="display: none;">
+            <div class="form-group">
+                <label for="test-email">Email Address (leave empty to use your account email):</label>
+                <input type="email" id="test-email" placeholder="test@example.com">
+            </div>
+            
+            <button class="btn success" onclick="sendTestEmail()">📧 Send Test Email</button>
+            
+            <div id="email-result"></div>
+        </div>
+
+        <!-- API Logs Tab -->
+        <div id="logs" class="content" style="display: none;">
+            <h3>Recent API Activity</h3>
+            <p>This section shows recent API calls and responses. Check your browser's Network tab for detailed request/response information.</p>
+            
+            <div class="form-group">
+                <label>Test API Endpoints:</label>
+                <button class="btn" onclick="testAPI('/api/health')">🏥 Health Check</button>
+                <button class="btn" onclick="testAPI('/api/debug/status')">🔍 Debug Status</button>
+                <button class="btn" onclick="testAPI('/api/courses')">📚 List Courses</button>
+            </div>
+            
+            <div id="api-result"></div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('token') || '';
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Check if user is logged in
+        if (!authToken) {
+            document.body.innerHTML = `
+                <div class="container" style="text-align: center; padding: 50px;">
+                    <h1>🔐 Authentication Required</h1>
+                    <p>Please log in to SWAYAM 2.0 first to access the debug dashboard.</p>
+                    <button class="btn" onclick="window.open('http://localhost:3000', '_blank')">🚀 Open SWAYAM 2.0</button>
+                </div>
+            `;
+        }
+
+        // Utility functions
+        function showTab(tabName) {
+            // Hide all content divs
+            document.querySelectorAll('.content').forEach(div => div.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                };
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const data = await response.json();
+                
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function displayResult(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (data.success) {
+                container.innerHTML = `<div class="result"><pre>${JSON.stringify(data.data, null, 2)}</pre></div>`;
+            } else {
+                container.innerHTML = `<div class="error">❌ Error: ${data.error || data.data?.message || 'Unknown error'}</div>`;
+            }
+        }
+
+        // System Overview Functions
+        async function refreshOverview() {
+            // Check server status
+            const statusResult = await apiCall('/debug/status');
+            const serverStatusDiv = document.getElementById('server-status');
+            
+            if (statusResult.success) {
+                const status = statusResult.data;
+                serverStatusDiv.innerHTML = `
+                    <p><span class="highlight">Status:</span> <span class="status online">Online</span></p>
+                    <p><span class="highlight">Uptime:</span> ${Math.floor(status.server.uptime / 60)} minutes</p>
+                    <p><span class="highlight">Database:</span> <span class="status ${status.database.status === 'connected' ? 'online' : 'offline'}">${status.database.status}</span></p>
+                    <p><span class="highlight">Email:</span> <span class="status ${status.email.user !== 'not configured' ? 'online' : 'warning'}">${status.email.user !== 'not configured' ? 'Configured' : 'Not Configured'}</span></p>
+                `;
+            } else {
+                serverStatusDiv.innerHTML = '<div class="error">❌ Failed to get server status</div>';
+            }
+
+            // Check database stats
+            const dbResult = await apiCall('/debug/db-overview');
+            const dbStatsDiv = document.getElementById('db-stats');
+            
+            if (dbResult.success) {
+                const stats = dbResult.data;
+                dbStatsDiv.innerHTML = `
+                    <p><span class="highlight">Users:</span> ${stats.users}</p>
+                    <p><span class="highlight">Courses:</span> ${stats.courses}</p>
+                    <p><span class="highlight">Progress Records:</span> ${stats.progress}</p>
+                `;
+            } else {
+                dbStatsDiv.innerHTML = '<div class="error">❌ Failed to get database stats</div>';
+            }
+        }
+
+        // Database Functions
+        async function viewUsers() {
+            const result = await apiCall('/debug/users');
+            displayResult('db-result', result);
+        }
+
+        async function viewCourses() {
+            const result = await apiCall('/debug/courses');
+            displayResult('db-result', result);
+        }
+
+        async function viewProgress() {
+            const result = await apiCall('/debug/progress');
+            displayResult('db-result', result);
+        }
+
+        // Email Functions
+        async function sendTestEmail() {
+            const emailInput = document.getElementById('test-email');
+            const body = emailInput.value ? { email: emailInput.value } : {};
+            
+            document.getElementById('email-result').innerHTML = '<div class="loading">📧 Sending test email...</div>';
+            
+            const result = await apiCall('/debug/test-email', 'POST', body);
+            
+            if (result.success) {
+                document.getElementById('email-result').innerHTML = `
+                    <div class="success">✅ ${result.data.message}</div>
+                    <p style="margin-top: 10px; color: #666;">Check your email inbox (and spam folder) for the test message.</p>
+                `;
+            } else {
+                document.getElementById('email-result').innerHTML = `
+                    <div class="error">❌ Failed to send test email: ${result.error || result.data?.message}</div>
+                `;
+            }
+        }
+
+        // API Testing Functions
+        async function testAPI(endpoint) {
+            document.getElementById('api-result').innerHTML = '<div class="loading">🔄 Testing API endpoint...</div>';
+            
+            const result = await apiCall(endpoint);
+            displayResult('api-result', result);
+        }
+
+        // Initialize dashboard
+        window.onload = function() {
+            if (authToken) {
+                refreshOverview();
+            }
+        };
+    </script>
+</body>
+</html>

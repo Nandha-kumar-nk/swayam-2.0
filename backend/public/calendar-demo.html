@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAYAM 2.0 - Calendar Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4ECDC4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-test {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        }
+
+        .btn-test:hover {
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .login-section {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .login-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .login-group {
+            flex: 1;
+        }
+
+        .login-group label {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .login-group input {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        #loginBtn {
+            padding: 10px 20px;
+            font-size: 14px;
+            width: auto;
+            margin-bottom: 0;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d3ff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .demo-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .demo-note h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .login-form {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .login-group {
+                width: 100%;
+            }
+
+            #loginBtn {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Calendar Demo</h1>
+            <p>SWAYAM 2.0 Smart Reminder System</p>
+        </div>
+
+        <div class="login-section">
+            <h3>🔐 Login Required</h3>
+            <p>Please login first to test calendar functionality:</p>
+            <div class="login-form">
+                <div class="login-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" value="john@example.com" placeholder="Enter email">
+                </div>
+                <div class="login-group">
+                    <label>Password:</label>
+                    <input type="password" id="password" value="password123" placeholder="Enter password">
+                </div>
+                <button id="loginBtn" class="btn">Login</button>
+            </div>
+        </div>
+
+        <div id="calendarForm" class="form-section hidden">
+            <div class="demo-note">
+                <h3>🎯 Demo Instructions:</h3>
+                <p>This demonstrates SWAYAM 2.0's calendar-based email reminder system. Set a date and time, and you'll receive an email exactly when scheduled!</p>
+            </div>
+
+            <div class="form-group">
+                <label for="title">📝 Reminder Title:</label>
+                <input type="text" id="title" placeholder="e.g., Complete React Assignment" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">📋 Description:</label>
+                <textarea id="description" placeholder="Add more details about your reminder..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="reminderDate">📅 Date:</label>
+                <input type="date" id="reminderDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reminderTime">⏰ Time:</label>
+                <input type="time" id="reminderTime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">📧 Email (optional - defaults to your account email):</label>
+                <input type="email" id="emailInput" placeholder="Optional: different email address">
+            </div>
+
+            <button id="scheduleBtn" class="btn">🗓️ Schedule Reminder</button>
+            <button id="testBtn" class="btn btn-test">⚡ Quick Test (5 seconds)</button>
+
+            <div id="status" class="status hidden"></div>
+
+            <div class="feature-list">
+                <div class="feature">
+                    <div class="feature-icon">📧</div>
+                    <h4>Smart Emails</h4>
+                    <p>Beautiful, responsive email templates</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⏰</div>
+                    <h4>Precise Timing</h4>
+                    <p>Accurate scheduling down to the minute</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h4>Professional Design</h4>
+                    <p>Modern UI with SWAYAM 2.0 branding</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚀</div>
+                    <h4>Real-time Demo</h4>
+                    <p>Perfect for presentations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        // Set default date and time (current time + 1 minute)
+        const now = new Date();
+        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        document.getElementById('reminderDate').value = tomorrow.toISOString().split('T')[0];
+        
+        const currentTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+        document.getElementById('reminderTime').value = currentTime.toTimeString().slice(0,5);
+
+        // Default values
+        document.getElementById('title').value = 'Demo Calendar Reminder';
+        document.getElementById('description').value = 'This is a test reminder from SWAYAM 2.0 calendar system! 🎉';
+
+        // Login functionality
+        document.getElementById('loginBtn').addEventListener('click', async function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showStatus('Please enter both email and password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.token;
+                    showStatus('✅ Login successful! You can now use the calendar.', 'success');
+                    document.querySelector('.login-section').style.display = 'none';
+                    document.getElementById('calendarForm').classList.remove('hidden');
+                } else {
+                    showStatus('❌ Login failed: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Login error: ' + error.message, 'error');
+            }
+        });
+
+        // Schedule reminder
+        document.getElementById('scheduleBtn').addEventListener('click', async function() {
+            if (!authToken) {
+                showStatus('Please login first!', 'error');
+                return;
+            }
+
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const reminderDate = document.getElementById('reminderDate').value;
+            const reminderTime = document.getElementById('reminderTime').value;
+            const email = document.getElementById('emailInput').value;
+
+            if (!title || !reminderDate || !reminderTime) {
+                showStatus('Please fill in all required fields!', 'error');
+                return;
+            }
+
+            try {
+                showStatus('⏳ Scheduling reminder...', 'info');
+
+                const response = await fetch('/api/calendar/reminder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        reminderDate,
+                        reminderTime,
+                        email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(`✅ ${data.message} Will trigger ${data.data.willTriggerIn}.`, 'success');
+                } else {
+                    showStatus('❌ Error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error scheduling reminder: ' + error.message, 'error');
+            }
+        });
+
+        // Test reminder (5 seconds)
+        document.getElementById('testBtn').addEventListener('click', async function() {
+            if (!authToken) {
+                showStatus('Please login first!', 'error');
+                return;
+            }
+
+            const title = document.getElementById('title').value || 'Demo Test Reminder';
+            const description = document.getElementById('description').value || 'This is a quick test of the calendar system!';
+            const email = document.getElementById('emailInput').value;
+
+            try {
+                showStatus('⚡ Scheduling test reminder for 5 seconds...', 'info');
+
+                const response = await fetch('/api/calendar/test-reminder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(`🎉 ${data.message}`, 'success');
+                    
+                    // Countdown timer
+                    let countdown = 5;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            showStatus(`📬 Test email will arrive in ${countdown} second${countdown !== 1 ? 's' : ''}...`, 'info');
+                        } else {
+                            clearInterval(countdownInterval);
+                            showStatus('📧 Test email should have been delivered! Check your inbox: kumar4112005@gmail.com', 'success');
+                        }
+                    }, 1000);
+                } else {
+                    showStatus('❌ Error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error scheduling test: ' + error.message, 'error');
+            }
+        });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -38,6 +38,10 @@ This project focuses on improving user experience, real-time interaction, notifi
 - Git & GitHub (version control)
 
 ---
+### AI Features
+
+- Gemini API (AI-powered chatbot)
+- Real-time conversational responses
 
 ## ✨ Key Features
 - User Authentication (Student / Instructor)
